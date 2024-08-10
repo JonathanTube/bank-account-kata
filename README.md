@@ -18,11 +18,14 @@ npm install
 ```
 ### dev
 - the backend server will running on port 3000
+- The sqlite3 database will be filled with 12 records while the backend server is running.
+- if you change the code of backend, the nodemon will reload this app, so the data you've already saved in the database will get lost. so using npm start to avoid it.
 ```
 npm run dev
 ```
 
 ### start
+- The sqlite3 database will be filled with 12 records while the backend server is running.
 ```
 npm start
 ```

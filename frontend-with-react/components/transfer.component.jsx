@@ -37,6 +37,7 @@ export default function TransferModel(props) {
         const transferAmount = +amount
         if (transferAmount && typeof transferAmount === 'number') {
             post('/transfer', {
+                iban,
                 amount: transferAmount
             }).then(res => {
                 if (res.success) {

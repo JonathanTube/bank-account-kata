@@ -4,7 +4,7 @@ const { sendOk, sendError } = require('../utils/http.util')
 
 module.exports = {
   statement: (req, res) => {
-    const { order = 'desc', page, limit } = req.query
+    const { order, page, limit, category, startDate, endDate } = req.query
     if (!page || !Number.isInteger(+page) || page < 0) {
       sendError(res, "Invalid page")
       return
@@ -29,15 +29,38 @@ module.exports = {
 
       result.total = data.total
 
-      let sql = `select id, amount, balance,category, createdAt from bank_account order by createdAt ${order === 'ascending' ? 'asc' : 'desc'} limit ? offset ?`
+      let sql = `select id, amount, balance,category, createdAt from bank_account`
+      const params = []
 
-      const stmt = db.prepare(sql, limit, offset)
+      const sql_conditions = []
+      if (category) {
+        sql_conditions.push('category = ?')
+        params.push(category)
+      }
+
+      if (startDate && endDate) {
+        sql_conditions.push('createdAt >= ? and createdAt <= ?')
+        params.push(startDate)
+        params.push(endDate)
+      }
+      if (params.length > 0) {
+        sql += ` where ${sql_conditions.join(' and ')}`
+      }
+
+      sql += ` order by createdAt ${order === 'ascending' ? 'asc' : 'desc'} limit ? offset ?`
+
+      params.push(limit)
+      params.push(offset)
+      console.log(sql)
+
+      const stmt = db.prepare(sql, params)
       stmt.all((err, data) => {
         if (err) {
           sendError(res, "Error fetching statement")
           return
         }
         result.records = data
+        // console.log(data)
         sendOk(res, "Statement fetched successfully", result)
       })
       stmt.finalize()

@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3').verbose()
 
 // initialize the sqlite database with memory mode.
-// const db = new sqlite3.Database(':memory:')
-const db = new sqlite3.Database('D:/test.sqlite')
+const db = new sqlite3.Database(':memory:')
+// const db = new sqlite3.Database('D:/test.sqlite')
 
 const initDB = () => {
     return new Promise((resolve, reject) => {
@@ -19,7 +19,7 @@ const initDB = () => {
                 console.error('failed to start the backend server', err.message)
                 reject(err)
             }
-            resolve(true)
+            resolve()
         })
     })
 }

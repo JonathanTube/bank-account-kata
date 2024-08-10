@@ -7,6 +7,7 @@ import { Spinner } from "@nextui-org/react"
 import DepositModel from '../components/deposit.component.jsx'
 import WithdrawModel from "../components/withdraw.component.jsx"
 import TransferModel from "../components/transfer.component.jsx"
+import Search from "../components/search.component.jsx";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -19,16 +20,20 @@ export default function App() {
   const [balance, setBalance] = useState(0)
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "createdAt",
-    direction: "ascending",
-  });
+    direction: "descending",
+  })
+  const [searchCondition, setSearchCondition] = useState()
 
   const loadTableData = () => {
-    get('/statement', {
+    const params = {
       page,
       limit: 10,
       column: sortDescriptor.column,
-      order: sortDescriptor.direction
-    }).then(res => {
+      order: sortDescriptor.direction,
+      ...searchCondition
+    }
+    console.log(params)
+    get('/statement', params).then(res => {
       const { success, message } = res
       if (success) {
         const { total, records, limit } = res.data
@@ -65,7 +70,7 @@ export default function App() {
 
   useEffect(() => {
     loadTableData()
-  }, [page, pages, sortDescriptor])
+  }, [page, pages, sortDescriptor, searchCondition])
 
 
   const onHideDepositModel = () => {
@@ -86,7 +91,6 @@ export default function App() {
     loadBalance()
   }
 
-
   const renderCell = React.useCallback((row, columnKey) => {
 
     const cellValue = row[columnKey]
@@ -94,33 +98,36 @@ export default function App() {
 
     if (columnKey === 'amount') {
       if (category === "deposit") {
-        return <Chip color="primary">{'+' + cellValue}</Chip>
+        return <Chip color="success">{'+' + cellValue}</Chip>
       } else if (category === "withdraw") {
         return <Chip color="secondary">{'-' + cellValue}</Chip>
       } else if (category === "transfer") {
         return <Chip color="danger">{'-' + cellValue}</Chip>
       }
-
     }
 
     return cellValue
 
   }, [])
 
+  const searchHandler = (data) => {
+    setSearchCondition({
+      ...data
+    })
+  }
 
   return (
     <main className="flex flex-col items-center w-screen h-screen npy-5">
       <p className="sticky w-full text-center leading-10 text-white text-xl h-10 bg-gradient-to-r from-cyan-600 to-blue-700">Your remaining balance is ${balance}</p>
       <div className="w-4/5">
-        <nav className="flex justify-start gap-4 my-5">
-          <Button color="primary" onClick={() => setOpenDepositModel(true)}>Deposit</Button>
-          <Button color="secondary" onClick={() => setOpenWithdrawModel(true)}>Withdraw</Button>
-          <Button color="danger" onClick={() => setOpenTransferModel(true)} >Transfer</Button>
-        </nav>
-
-        <DepositModel show={openDepositModel} onHide={onHideDepositModel} />
-        <WithdrawModel show={openWithdrawModel} onHide={onHideWithdrawModel} />
-        <TransferModel show={openTransferModel} onHide={onHideTransferModel} />
+        <div className="flex justify-between items-center gap-5">
+          <Search onChange={searchHandler} />
+          <div className="grid grid-cols-3 gap-5 my-5">
+            <Button color="success" onClick={() => setOpenDepositModel(true)}>Deposit</Button>
+            <Button color="secondary" onClick={() => setOpenWithdrawModel(true)}>Withdraw</Button>
+            <Button color="danger" onClick={() => setOpenTransferModel(true)} >Transfer</Button>
+          </div>
+        </div>
 
         <Table isStriped aria-label="data list of your bank account"
           bottomContent={
@@ -138,7 +145,6 @@ export default function App() {
           onSortChange={setSortDescriptor}
         >
           <TableHeader>
-            <TableColumn key="id">ID</TableColumn>
             <TableColumn key="createdAt" allowsSorting>DATE</TableColumn>
             <TableColumn key="amount">AMOUNT</TableColumn>
             <TableColumn key="balance">BALANCE</TableColumn>
@@ -159,6 +165,11 @@ export default function App() {
           </TableBody>
         </Table>
       </div>
+
+      <DepositModel show={openDepositModel} onHide={onHideDepositModel} />
+      <WithdrawModel show={openWithdrawModel} onHide={onHideWithdrawModel} />
+      <TransferModel show={openTransferModel} onHide={onHideTransferModel} />
+
       <ToastContainer />
     </main >
   );

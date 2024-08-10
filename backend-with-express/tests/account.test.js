@@ -6,10 +6,15 @@ const { initDB, db } = require('../utils/sqlite.util.js')
 beforeAll(async () => {
     initDB()
 })
+
 describe("test operations about bank account", () => {
+    it("clean the default records", async () => {
+        db.exec('delete from bank_account')
+    })
+
     it("the records of bank account should be empty at first", async () => {
         const res = await request(app).get("/api/statement?page=1&limit=2")
-        console.log(res.body)
+        // console.log(res.body)
         expect(res.body.data.records).toEqual([])
     })
 
