@@ -1,0 +1,28 @@
+{
+  "name": "backend-with-express",
+  "version": "1.0.0",
+  "description": "backend server for code challenge of bank account kata",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "interview",
+    "code",
+    "challenge"
+  ],
+  "author": "Jonathan",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
+  }
+}
